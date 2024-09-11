@@ -202,6 +202,7 @@ if st.button('Submit'):
     values = list(percentages.values())
     bars = ax.barh(group_names, values, color='skyblue')
     ax.set_xlabel('Impact (%)')
+    ax.set_xlim(0, 100)
 
     # Add percentage labels to the bars
     for bar in bars:
