@@ -5,6 +5,8 @@ import joblib
 import os
 import base64
 import requests
+import shap
+import matplotlib.pyplot as plt
 
 # Define the available options for country and industry
 countries = {
@@ -41,7 +43,7 @@ def download_model_from_dropbox():
         response.raise_for_status()
         with open(local_model_path, 'wb') as f:
             f.write(response.content)
-        st.success("Model downloaded successfully.")
+        #st.success("Model downloaded successfully.")
     except requests.RequestException as e:
         st.error(f"An error occurred while downloading the model: {e}")
         raise
@@ -53,9 +55,9 @@ def load_model():
         download_model_from_dropbox()
 
     try:
-        st.info("Loading model...")
+        #st.info("Loading model...")
         model = joblib.load(local_model_path)
-        st.success("Model loaded successfully.")
+        #st.success("Model loaded successfully.")
         return model
     except Exception as e:
         st.error(f"An error occurred while loading the model: {e}")
@@ -140,3 +142,71 @@ if st.button('Submit'):
        
     #Display the prediction
     st.markdown(f"<h2>Predicted Company Value in millions: €{np.exp(prediction[0]):,.2f}</h3>", unsafe_allow_html=True)
+
+    # --- SHAP explainability part ---
+    explainer = shap.TreeExplainer(model)
+    # Compute SHAP values for X_new (local explanation)
+    shap_values_one = explainer(X_new)
+
+    # Define groups
+    groups = {
+        'Market': ['Market_LM', 'Market_NM', 'Market_HM'],
+        'Region': [
+            'Target_Region_Eastern Europe', 'Target_Region_Nordics',
+            'Target_Region_North America', 'Target_Region_Southern Europe',
+            'Target_Region_UK', 'Target_Region_Western Europe'
+        ],
+        'Industry': [
+            'Target_Industry_Macro_Consumer Products and Services',
+            'Target_Industry_Macro_Consumer Staples',
+            'Target_Industry_Macro_Energy and Power',
+            'Target_Industry_Macro_Financials', 'Target_Industry_Macro_Healthcare',
+            'Target_Industry_Macro_High Technology', 'Target_Industry_Macro_Industrials',
+            'Target_Industry_Macro_Materials', 'Target_Industry_Macro_Media and Entertainment',
+            'Target_Industry_Macro_Real Estate', 'Target_Industry_Macro_Retail',
+            'Target_Industry_Macro_Telecommunications'
+        ],
+        'Status': ['Target_Status_Public'],
+        'Revenues': ['log_Target_Revenues'],
+        'EBITDA': ['log_Target_EBITDA']
+    }
+    
+    # Create a dictionary to hold the grouped SHAP values
+    grouped_shap_values = {group: 0 for group in groups}
+
+    # Extract the values from shap_values_one
+    shap_values_array = np.exp(shap_values_one[0].values)  # Extract SHAP values array from Explanation object
+
+    # Ensure that shap_values_array is 2D; if not, make it 2D
+    if shap_values_array.ndim == 1:
+        shap_values_array = shap_values_array.reshape(1, -1)
+
+    # Sum the SHAP values within each group
+    for group, variables in groups.items():
+        # Extract indices of the variables in the group
+        indices = [X_new.columns.get_loc(var) for var in variables if var in X_new.columns]
+        if indices:
+            # Sum SHAP values for the indices in the group
+            grouped_shap_values[group] = shap_values_array[0, indices].sum()
+    
+     # Calculate total impact
+    total_impact = sum(grouped_shap_values.values())
+    print(grouped_shap_values)
+    # Calculate percentages
+    percentages = {group: (value / total_impact) * 100 for group, value in grouped_shap_values.items()}
+
+    # Plot the grouped SHAP values as percentages
+    fig, ax = plt.subplots(figsize=(10, 6))
+    group_names = list(percentages.keys())
+    values = list(percentages.values())
+    bars = ax.barh(group_names, values, color='skyblue')
+    ax.set_xlabel('Impact (%)')
+
+    # Add percentage labels to the bars
+    for bar in bars:
+        width = bar.get_width()
+        ax.text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}%',
+                va='center', ha='left', color='black')
+
+    ax.set_title('SHAP Value Impact by Group (%)')
+    st.pyplot(fig)
