@@ -11,3 +11,4 @@ ipdb==0.13.9
 jupyterlab==3.4.8
 pylint==2.14.5
 streamlit==1.38.0
+requests==2.31.0
