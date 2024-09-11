@@ -29,33 +29,34 @@ industries = [
     'Real Estate', 'Retail', 'Telecommunications'
 ]
 
-# Download the model from Dropbox
 @st.cache_data(show_spinner=False)
 def download_model_from_dropbox():
     url = 'https://www.dropbox.com/scl/fi/0yixy98hccpu309cpojez/model.pkl?rlkey=ldr8mm08fzr49jpctmk6pckv3&st=e8ueabx6&dl=1'
     local_model_path = 'model/model.pkl'
     
-    # Create local model directory if it doesn't exist
     os.makedirs(os.path.dirname(local_model_path), exist_ok=True)
 
     try:
         response = requests.get(url)
-        response.raise_for_status()  # Check for request errors
+        response.raise_for_status()
         with open(local_model_path, 'wb') as f:
             f.write(response.content)
+        st.success("Model downloaded successfully.")
     except requests.RequestException as e:
         st.error(f"An error occurred while downloading the model: {e}")
         raise
 
-#Load the trained model
 def load_model():
     local_model_path = 'model/model.pkl'
     
-    # Check if model is already downloaded
     if not os.path.exists(local_model_path):
         download_model_from_dropbox()
+
     try:
-        return joblib.load(local_model_path)
+        st.info("Loading model...")
+        model = joblib.load(local_model_path)
+        st.success("Model loaded successfully.")
+        return model
     except Exception as e:
         st.error(f"An error occurred while loading the model: {e}")
         raise
