@@ -208,6 +208,6 @@ if st.button('Submit'):
     #for bar in bars:
     #    width = bar.get_width()
     #    ax.text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}%',
-                va='center', ha='left', color='black')
+                #va='center', ha='left', color='black')
 
     st.pyplot(fig)
