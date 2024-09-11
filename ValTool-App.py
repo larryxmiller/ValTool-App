@@ -38,7 +38,7 @@ def download_model_from_dropbox():
     # Create local model directory if it doesn't exist
     os.makedirs(os.path.dirname(local_model_path), exist_ok=True)
 
-     try:
+    try:
         response = requests.get(url)
         response.raise_for_status()  # Check for request errors
         with open(local_model_path, 'wb') as f:
