@@ -1,7 +1,7 @@
 streamlit #==1.38.0
 numpy #==1.23.4
 pandas #==1.4.4
-joblib #==1.4.2
+joblib==1.4.2
 setuptools  #For distutils
 scikit-learn #==1.5.1
 requests #==2.32.3  For Dropbox
