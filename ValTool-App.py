@@ -205,9 +205,9 @@ if st.button('Submit'):
     ax.set_xlim(0, 100)
 
     # Add percentage labels to the bars
-    #for bar in bars:
-    #    width = bar.get_width()
-    #    ax.text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}%',
-                #va='center', ha='left', color='black')
+    for bar in bars:
+        width = bar.get_width()
+        ax.text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}%',
+                va='center', ha='left', color='black')
 
     st.pyplot(fig)
