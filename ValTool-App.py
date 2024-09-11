@@ -198,16 +198,16 @@ if st.button('Submit'):
 
     # Plot the grouped SHAP values as percentages
     fig, ax = plt.subplots(figsize=(10, 6))
-    group_names = list(percentages.keys())
-    values = list(percentages.values())
+    sorted_percentages = sorted(percentages.items(), key=lambda x: x[1])
+    group_names, values = zip(*sorted_percentages)  # Unzip the sorted tuples
     bars = ax.barh(group_names, values, color='skyblue')
     ax.set_xlabel('Impact (%)')
     ax.set_xlim(0, 100)
 
     # Add percentage labels to the bars
-    for bar in bars:
-        width = bar.get_width()
-        ax.text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}%',
+    #for bar in bars:
+    #    width = bar.get_width()
+    #    ax.text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}%',
                 va='center', ha='left', color='black')
 
     st.pyplot(fig)
