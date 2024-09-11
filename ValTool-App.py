@@ -4,6 +4,7 @@ import pandas as pd
 import joblib
 import os
 import base64
+import requests
 
 # Define the available options for country and industry
 countries = {
