@@ -5,3 +5,5 @@ joblib==1.4.2
 setuptools  #For distutils
 scikit-learn #==1.5.1
 requests #==2.32.3  For Dropbox
+shap
+matplotlib
