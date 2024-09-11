@@ -147,6 +147,7 @@ if st.button('Submit'):
     explainer = shap.TreeExplainer(model)
     # Compute SHAP values for X_new (local explanation)
     shap_values_one = explainer(X_new)
+    st.markdown("The chart below illustrates the percentage impact of the variables on the predicted value.")
 
     # Define groups
     groups = {
@@ -208,5 +209,4 @@ if st.button('Submit'):
         ax.text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}%',
                 va='center', ha='left', color='black')
 
-    ax.set_title('SHAP Value Impact by Group (%)')
     st.pyplot(fig)
